@@ -7,9 +7,10 @@
   >
     <div v-if="messages.length > 0">
       <div
-        class="flex items-center max-w-sm p-1 mx-auto space-x-2 rounded-xl"
-        v-for="(item, index) of messages"
-        :key="index"
+        class="flex items-center max-w-sm p-1 mx-auto space-x-2 rounded-xl cursor-pointer"
+        v-for="item of messages"
+        :key="item.id"
+        @click="onMarkRead(item.id)"
       >
         <div class="flex-shrink-0">
           <n-icon size="40" color="#f00">
@@ -18,7 +19,7 @@
         </div>
         <div>
           <div class="text-sm font-medium">{{ item.title }}</div>
-          <n-ellipsis :line-clamp="1" class="text-gray-500">{{ item.desc }}</n-ellipsis>
+          <n-ellipsis :line-clamp="1" class="text-gray-500">{{ item.content }}</n-ellipsis>
         </div>
       </div>
     </div>
@@ -26,52 +27,39 @@
     <template #footer>
       <div class="flex justify-evenly">
         <n-button type="text" @click="onClearMessage">清空消息</n-button>
-        <n-button type="text">查看更多</n-button>
+        <n-button type="text" @click="onViewMore">查看更多</n-button>
       </div>
     </template>
   </n-card>
 </template>
 
 <script lang="ts">
-  import { defineComponent, shallowReactive } from 'vue'
+  import { computed, defineComponent } from 'vue'
+  import { useRouter } from 'vue-router'
   import { NotificationsCircle } from '@vicons/ionicons5'
+  import useMessageStore from '@/store/modules/message'
   export default defineComponent({
     name: 'PopoverMessage',
     components: { NotificationsCircle },
     emits: ['clear'],
     setup(props, { emit }) {
-      const messages = shallowReactive([
-        {
-          title: '您收到一个消息',
-          desc: '来自好友张三的生日祝福',
-        },
-        {
-          title: '您收到一个消息',
-          desc: '来自好友张三的生日祝福来自好友张三的生日祝福',
-        },
-        {
-          title: '您收到一个消息',
-          desc: '来自好友张三的生日祝福来自好友张三的生日祝福',
-        },
-        {
-          title: '您收到一个消息',
-          desc: '来自好友张三的生日祝福来自好友张三的生日祝福来自好友张三的生日祝福来自好友张三的生日祝福',
-        },
-        {
-          title: '您收到一个消息',
-          desc: '来自好友张三的生日祝福',
-        },
-        {
-          title: '您收到一个消息',
-          desc: '来自好友张三的生日祝福',
-        },
-      ])
+      const router = useRouter()
+      const messageStore = useMessageStore()
+      const messages = computed(() => messageStore.messages.slice(0, 6))
       function onClearMessage() {
-        messages.length = 0
+        messageStore.clearMessages()
         emit('clear')
+      }
+      function onViewMore() {
+        router.push('/personal/info')
+      }
+      function onMarkRead(id: string) {
+        messageStore.markRead(id)
       }
       return {
         onClearMessage,
+        onViewMore,
+        onMarkRead,
         messages,
       }
     },

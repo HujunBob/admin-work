@@ -18,7 +18,7 @@
         </n-badge>
         <div v-else></div>
       </template>
-      <PopoverMessage @clear="badgeValue = 0" />
+      <PopoverMessage />
     </n-popover>
     <span v-if="appConfig.actionBar.isShowRefresh" class="action-item" @click="onRefrehRoute">
       <n-icon size="18">
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref } from 'vue'
+  import { computed, defineComponent, ref } from 'vue'
   import { useMessage } from 'naive-ui'
   import screenfull from 'screenfull'
   import { useRoute, useRouter } from 'vue-router'
@@ -54,6 +54,7 @@
     RefreshOutline as RefreshIcon,
   } from '@vicons/ionicons5'
   import useAppConfigStore from '@/store/modules/app-config'
+  import useMessageStore from '@/store/modules/message'
   import { useDebounceFn } from '@vueuse/core'
   export default defineComponent({
     name: 'ActionItems',
@@ -69,7 +70,8 @@
       const showSearchContent = ref(false)
       const searchContent = ref('')
       const settingRef = ref()
-      const badgeValue = ref(3)
+      const messageStore = useMessageStore()
+      const badgeValue = computed(() => messageStore.unreadCount)
       const appConfig = useAppConfigStore()
       const message = useMessage()
       const router = useRouter()

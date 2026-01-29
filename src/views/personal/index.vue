@@ -85,9 +85,10 @@
             <n-button type="text"> 查看更多 </n-button>
           </template>
           <div
-            v-for="(item, index) of messages"
-            :key="index"
-            class="flex items-center message-wrapper"
+            v-for="item of messages"
+            :key="item.id"
+            class="flex items-center message-wrapper cursor-pointer"
+            @click="onMarkRead(item.id)"
           >
             <div
               class="notify"
@@ -109,9 +110,10 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref } from 'vue'
+  import { computed, defineComponent, ref } from 'vue'
   import { CameraOutline } from '@vicons/ionicons5'
   import useUserStore from '@/store/modules/user'
+  import useMessageStore from '@/store/modules/message'
   export default defineComponent({
     name: 'Personal',
     components: { CameraOutline },
@@ -119,6 +121,8 @@
       const touched = ref(false)
       const uploaded = ref(false)
       const userStore = useUserStore()
+      const messageStore = useMessageStore()
+      const messages = computed(() => messageStore.messages)
       const avatarTouchStart = () => {
         touched.value = true
       }
@@ -129,41 +133,13 @@
           uploaded.value = false
         }, 1000)
       }
+      const onMarkRead = (id: string) => {
+        messageStore.markRead(id)
+      }
       return {
         touched,
         uploaded,
-        messages: [
-          {
-            title: '【总经理通知】',
-            content:
-              '明天【下午】有【不拘一格】课程直播，公司尝试全新直播模式，其中会直播各个部门员工的工作常态，需要全体家人的配合与支持。具体要求如下：1.、办公桌上只允许放：电脑、水杯、笔记本、笔、电话2.、座椅后背不允许挂衣服，全部放到厨子里3、直播期间，全员上身着工装外套4、直播期间请勿随意走动，文明用语，若进入直播镜头请微笑示意课程直播不仅是介绍课程，更重要的是向客户展示优行教育！[嘿哈][嘿哈][嘿哈]',
-            status: 0, // 0未读 1已读
-          },
-          {
-            title: '重要通知：今天要加班，一堆bug等着修改，请全体家人们注意',
-            content:
-              '为了配合市场家人们努力开单，从今天开始，技术部及教研老师们要努力加班，全力配合市场的家人们多多开单。谢谢大家的支持与配合。',
-            status: 0, // 0未读 1已读
-          },
-          {
-            title: '重要通知：今天要加班，一堆bug等着修改，请全体家人们注意',
-            content:
-              '为了配合市场家人们努力开单，从今天开始，技术部及教研老师们要努力加班，全力配合市场的家人们多多开单。谢谢大家的支持与配合。',
-            status: 1, // 0未读 1已读
-          },
-          {
-            title: '重要通知：今天要加班，一堆bug等着修改，请全体家人们注意',
-            content:
-              '为了配合市场家人们努力开单，从今天开始，技术部及教研老师们要努力加班，全力配合市场的家人们多多开单。谢谢大家的支持与配合。',
-            status: 1, // 0未读 1已读
-          },
-          {
-            title: '重要通知：今天要加班，一堆bug等着修改，请全体家人们注意',
-            content:
-              '为了配合市场家人们努力开单，从今天开始，技术部及教研老师们要努力加班，全力配合市场的家人们多多开单。谢谢大家的支持与配合。',
-            status: 1, // 0未读 1已读
-          },
-        ],
+        messages,
         watingJobs: [
           {
             title: '和朋友同事一起玩王者，吃鸡',
@@ -210,6 +186,7 @@
         nickName: userStore.nickName,
         avatarTouchStart,
         uploadAvatar,
+        onMarkRead,
       }
     },
   })
